@@ -123,12 +123,8 @@ def rand_die_multiset_walk(n, burn = lambda x: 3*x*log(x)):
         die[x-a] += 1
         die[y] -= 1
         die[y+a] += 1
-        if min(die)<0:
-            print "a:",a," x:",x," y:",y
-            print "die:",die
-            raise Exception("WHAT!?")
-    assert(sum(die)==n)
-    assert(min(die)>=0)
+    #assert(sum(die)==n)
+    #assert(min(die)>=0)
 
     # convert to sorted sequence representation
     A = []
