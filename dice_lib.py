@@ -339,6 +339,7 @@ def sequence_to_multiset(A):
     return B
 
 def multiset_to_sequence(A):
+    n = len(A)
     B = []
     for i in xrange(n):
         B += [i+1]*A[i]
@@ -347,6 +348,6 @@ def multiset_to_sequence(A):
 def inverse_die(A):
     B = sequence_to_multiset(A)
     B.reverse()
-    return multiset_to_sequenc(B)
+    return multiset_to_sequence(B)
 
 
