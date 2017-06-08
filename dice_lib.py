@@ -5,6 +5,7 @@ import random
 import itertools
 from math import log
 
+
 def rand_die_multiset(n):
     '''random proper die selected uniformly from multiset representation
 
@@ -70,6 +71,34 @@ def rand_die_sequence(n):
         A.append(diff)
         return A
 
+def rand_die_max2multiset(n):
+    '''random proper die selected uniformly from multiset representation
+    with restriction that entries are maximum of 2
+
+    die properties:
+      allowed values: integers 1 to n
+      sum constrained to n*(n+1)/2
+    random distribution:
+      die selected uniform in multiset representation with max 2 constraint
+
+    die returned in sorted sequence representation
+    '''
+    s = n*(n+1)/2
+    while 1:
+        c = [random.randint(0,2) for i in xrange(n-1)]
+        diff = n-sum(c)
+        if diff<0 or diff>2:
+            continue
+        c.append(diff)
+
+        # convert to sorted sequence representation
+        A = []
+        for i in xrange(n):
+            A += [i+1]*c[i]
+
+        if sum(A) == s:
+            return A
+
 
 def rand_die_sequence_walk(n, burn = lambda x: 3*x*log(x)):
     '''random proper die generated with randomwalk, limit is uniform in
@@ -131,6 +160,71 @@ def rand_die_multiset_walk(n, burn = lambda x: 3*x*log(x)):
     for i in xrange(n):
         A += [i+1]*die[i]
     return A
+
+def rand_die_max2multiset_walk(n, burn = lambda x: 3*x*log(x)):
+    '''random proper die generated with randomwalk, limit is uniform in
+    multiset representation with restriction that entries are a maximum of 2
+
+    Intended to be a faster version of rand_die_max2multiset.
+
+    burn(n) sets how the number of random steps should scale with n.
+    If this is large enough, the results should select uniformly in the
+    multiset representation with restriction that entries are a maximum of 2
+    '''
+    nsteps = int(burn(n))
+
+    # start in multiset representation of standard die
+    die = [1]*n
+    for i in xrange(nsteps):
+        a = random.randrange(1,n/2) # amount to change die value
+        x = random.randrange(a,n) # take a die from here and move it down
+        y = random.randrange(n-a) # take a die from here and move it up
+        if x==y:
+            if die[x] < 2:
+                continue
+        elif die[x] < 1 or die[y] < 1:
+            continue
+        if x-a == y+a:
+            if die[x-a] > 0:
+                continue
+        elif die[x-a] > 1 or die[y+a] > 1:
+            continue
+
+        die[x] -= 1
+        die[x-a] += 1
+        die[y] -= 1
+        die[y+a] += 1
+    assert(sum(die)==n)
+    assert(min(die)>=0)
+    assert(max(die)<=2)
+
+    # convert to sorted sequence representation
+    A = []
+    for i in xrange(n):
+        A += [i+1]*die[i]
+    return A
+
+
+rand_type_options = {
+    "sequence": rand_die_sequence,
+    "sequence_walk": rand_die_sequence_walk,
+    "multiset": rand_die_multiset,
+    "multiset_walk": rand_die_multiset_walk,
+    "max2multiset": rand_die_max2multiset,
+    "max2multiset_walk": rand_die_max2multiset_walk,
+    }
+
+rand_type_options_string = (
+"""<rand_type> options: 
+    sequence, sequence_walk, multiset, multiset_walk, 
+    max2multiset, max2multiset_walk
+"""
+)
+
+def select_rand_type(rand_type):
+    if rand_type in rand_type_options:
+        return rand_type_options[rand_type]
+    return None
 
 
 def distance(A,B):
@@ -236,4 +330,23 @@ def has_intransitive_sequence(fdice):
             if fastdice_compare(fdice[p[0]],fdice[p[-1]])<0:
                 return p
     return None
+
+def sequence_to_multiset(A):
+    n = len(A)
+    B = [0]*n
+    for x in A:
+        B[x-1] += 1
+    return B
+
+def multiset_to_sequence(A):
+    B = []
+    for i in xrange(n):
+        B += [i+1]*A[i]
+    return B
+
+def inverse_die(A):
+    B = sequence_to_multiset(A)
+    B.reverse()
+    return multiset_to_sequenc(B)
+
 

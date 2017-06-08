@@ -11,22 +11,14 @@ if len(sys.argv)<4:
     print "Usage: k4_test <rand_type> <n> <ntest>\n"
     print "randomly choses 4 <n> sided dice,"
     print "and counts the fraction of ties and intransitives"
-    print "<rand_type> options: "
-    print "    sequence, multiset, sequence_walk, multiset_walk"
+    print rand_type_options_string
     sys.exit(1)
 rand_type = sys.argv[1]
 n = int(sys.argv[2])
 ntest = int(sys.argv[3])
 
-if rand_type == "sequence":
-    rand_die = rand_die_sequence
-elif rand_type == "sequence_walk":
-    rand_die = rand_die_sequence_walk
-elif rand_type == "multiset":
-    rand_die = rand_die_multiset
-elif rand_type == "multiset_walk":
-    rand_die = rand_die_multiset_walk
-else:
+rand_die = select_rand_type(rand_type) 
+if rand_die is None:
     print "Unsupported rand_type requested: %s"%rand_type
     sys.exit(1)
 
