@@ -6,6 +6,7 @@ from dice_lib import *
 import random
 import time
 import sys
+from math import sqrt
 
 if len(sys.argv)<4:
     print "Usage: inverse_test <rand_type> <n> <ntest>"
@@ -56,11 +57,21 @@ for i in xrange(ndice):
 
 
 scores=[]
+beats=[]
 for i in xrange(ndice):
     row=[]
+    rowb=[]
     for j in xrange(ndice):
-       row.append(fastdice_compare(fdice[i],fdice[j]))
+        val=fastdice_compare(fdice[i],fdice[j])
+        row.append(val)
+        if val<0:
+            rowb.append(-1)
+        elif val>0:
+            rowb.append(1)
+        else:
+            rowb.append(0)
     scores.append(row)
+    beats.append(rowb)
 
 # Print the score matrix
 fmt="%5d"
@@ -86,5 +97,25 @@ for i in xrange(ndice):
     if a != b:
         print "Found FAILURE! %d,%d" %(i,inverse[i])
 
-print "Done"
+print "Pass\n"
+
+
+
+def norm(V):
+    s=0.0
+    for x in V:
+        s += x*x
+    return sqrt(s)
+
+print "i: norm(diff),norm(sym),norm(anti), sum(scores[i]),sum(beats[i])"
+for i in xrange(ndice):
+    diff, sym, anti = sequence_to_difftriplet(dice[i])
+    print "%d: %f, %f, %f  .. %d, %d"%(i,norm(diff),norm(sym),norm(anti),
+                                   sum(scores[i]),sum(beats[i]))
+    if 0:
+        print dice[i]
+        print diff
+        print sym
+        print anti
+
 

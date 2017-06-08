@@ -338,6 +338,24 @@ def sequence_to_multiset(A):
         B[x-1] += 1
     return B
 
+def sequence_to_diffmultiset(A):
+    n = len(A)
+    B = [-1]*n
+    for x in A:
+        B[x-1] += 1
+    assert(sum(B)==0)
+    return B
+
+def sequence_to_difftriplet(A):
+    '''(diff, symmetric_part, antisymmetric_part)'''
+    n = len(A)
+    B = sequence_to_diffmultiset(A)
+    invB = list(B)
+    invB.reverse()
+    sym     = [ (B[i]+invB[i])/2.0 for i in xrange(n) ]
+    antisym = [ (B[i]-invB[i])/2.0 for i in xrange(n) ]
+    return (B,sym,antisym)
+
 def multiset_to_sequence(A):
     n = len(A)
     B = []
@@ -349,5 +367,6 @@ def inverse_die(A):
     B = sequence_to_multiset(A)
     B.reverse()
     return multiset_to_sequence(B)
+
 
 
